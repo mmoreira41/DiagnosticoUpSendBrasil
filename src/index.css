@@ -3,13 +3,13 @@
 /* ==========================================
    Upsend Brasil — Marketing Agency Design System
    Liquid Glass – estilo Apple com glassmorphism
-   Crystal Blue como marca · Cormorant + DM Sans
+   Crystal Blue como marca · Lato + DM Sans
    ========================================== */
 
 @theme {
   /* ── Tipografia ── */
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-display: "Lato", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "Courier New", monospace;
 
   /* ── Paleta principal ── */
@@ -137,25 +137,25 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ══════════════════════════════════════════
-   TIPOGRAFIA DISPLAY — Cormorant Garamond
+   TIPOGRAFIA DISPLAY — Lato
 ══════════════════════════════════════════ */
 
 .hero-number {
-  font-family: "Bebas Neue", "Cormorant Garamond", Georgia, serif;
+  font-family: "Bebas Neue", "Lato", ui-sans-serif, system-ui, sans-serif;
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: 0.01em;
 }
 
 .display-italic {
-  font-family: "Cormorant Garamond", Georgia, serif;
+  font-family: "Lato", ui-sans-serif, system-ui, sans-serif;
   font-weight: 400;
   font-style: italic;
   line-height: 1.1;
 }
 
 .font-display {
-  font-family: "Cormorant Garamond", Georgia, serif;
+  font-family: "Lato", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ══════════════════════════════════════════

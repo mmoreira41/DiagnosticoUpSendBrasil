@@ -1,3 +1,10 @@
+export interface GbpProfile {
+  id: string
+  nome?: string
+  rating?: number
+  totalReviews?: number
+}
+
 export interface Competitor {
   id: string
   name: string
@@ -82,6 +89,7 @@ export interface DiagnosticData {
   gbpHasProfile?: boolean
   gbpRating?: number
   gbpTotalReviews?: number
+  gbpProfiles?: GbpProfile[]
 
   // Valuation
   estimatedCpcAverage: number

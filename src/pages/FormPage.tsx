@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { DiagnosticData, Competitor } from '../types'
+import { DiagnosticData, Competitor, GbpProfile } from '../types'
 import { supabase } from '../lib/supabase'
 import { Plus, Trash2, ArrowRight, Eye, ChevronDown, Info } from 'lucide-react'
 
@@ -49,6 +49,7 @@ const initialData: DiagnosticData = {
   gbpHasProfile: false,
   gbpRating: 0,
   gbpTotalReviews: 0,
+  gbpProfiles: [],
   estimatedCpcAverage: 0,
   valuationMultiplier: 36,
   valuationNotes: '',
@@ -484,6 +485,22 @@ export default function FormPage() {
     setData((prev) => ({ ...prev, competitors: prev.competitors.filter((c) => c.id !== id) }))
   }
 
+  const addGbpProfile = () => {
+    const novo: GbpProfile = { id: `gbp${Date.now()}`, nome: '', rating: undefined, totalReviews: undefined }
+    setData((prev) => ({ ...prev, gbpProfiles: [...(prev.gbpProfiles ?? []), novo] }))
+  }
+
+  const removeGbpProfile = (id: string) => {
+    setData((prev) => ({ ...prev, gbpProfiles: (prev.gbpProfiles ?? []).filter((p) => p.id !== id) }))
+  }
+
+  const updateGbpProfile = (id: string, field: keyof GbpProfile, value: string | number | undefined) => {
+    setData((prev) => ({
+      ...prev,
+      gbpProfiles: (prev.gbpProfiles ?? []).map((p) => (p.id === id ? { ...p, [field]: value } : p)),
+    }))
+  }
+
   const updateCompetitor = (id: string, field: keyof Competitor, value: string | number | boolean) => {
     setData((prev) => ({
       ...prev,
@@ -611,6 +628,9 @@ export default function FormPage() {
       gbpHasProfile: true,
       gbpRating: 4.3,
       gbpTotalReviews: 47,
+      gbpProfiles: [
+        { id: 'gbp1', nome: 'Perfil Principal', rating: 4.3, totalReviews: 47 },
+      ],
       estimatedCpcAverage: 9.2,
       valuationMultiplier: 36,
       valuationNotes: 'Tráfego atual de 1.800 visitas/mês × R$ 9,20/clique = R$ 16.560/mês em mídia equivalente.',
@@ -963,35 +983,85 @@ export default function FormPage() {
             <div className="space-y-4 pt-4">
               <Toggle
                 checked={data.gbpHasProfile || false}
-                onChange={(v) => setData((p) => ({ ...p, gbpHasProfile: v }))}
+                onChange={(v) => {
+                  setData((p) => ({
+                    ...p,
+                    gbpHasProfile: v,
+                    gbpProfiles: v && (p.gbpProfiles ?? []).length === 0
+                      ? [{ id: `gbp${Date.now()}`, nome: '', rating: undefined, totalReviews: undefined }]
+                      : p.gbpProfiles,
+                  }))
+                }}
                 label="Possui GBP configurado?"
               />
 
               {data.gbpHasProfile && (
-                <div className="grid grid-cols-2 gap-4 pt-1">
-                  <FormField label="Avaliação (1–5 estrelas)">
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="5"
-                      name="gbpRating"
-                      value={data.gbpRating || ''}
-                      onChange={handleChange}
-                      className="form-input"
-                      placeholder="Ex: 4.3"
-                    />
-                  </FormField>
-                  <FormField label="Total de avaliações">
-                    <input
-                      type="number"
-                      name="gbpTotalReviews"
-                      value={data.gbpTotalReviews || ''}
-                      onChange={handleChange}
-                      className="form-input"
-                      placeholder="Ex: 87"
-                    />
-                  </FormField>
+                <div className="space-y-3 pt-1">
+                  {(data.gbpProfiles ?? []).map((perfil, idx) => (
+                    <div
+                      key={perfil.id}
+                      className="rounded-xl p-4 space-y-3"
+                      style={{ background: 'rgba(18,123,240,0.04)', border: '1px solid rgba(18,123,240,0.1)' }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
+                          Perfil {idx + 1}
+                        </span>
+                        {(data.gbpProfiles ?? []).length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeGbpProfile(perfil.id)}
+                            className="p-1 rounded-lg transition-colors hover:bg-red-50"
+                            style={{ color: 'var(--color-text-muted)' }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <FormField label="Nome / Identificação">
+                          <input
+                            className="form-input"
+                            value={perfil.nome || ''}
+                            onChange={(e) => updateGbpProfile(perfil.id, 'nome', e.target.value)}
+                            placeholder="Ex: Perfil Principal"
+                          />
+                        </FormField>
+                        <FormField label="Avaliação (1–5 estrelas)">
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            max="5"
+                            className="form-input"
+                            value={perfil.rating ?? ''}
+                            onChange={(e) => updateGbpProfile(perfil.id, 'rating', e.target.value === '' ? undefined : Number(e.target.value))}
+                            placeholder="Ex: 4.3"
+                          />
+                        </FormField>
+                        <FormField label="Total de avaliações">
+                          <input
+                            type="number"
+                            className="form-input"
+                            value={perfil.totalReviews ?? ''}
+                            onChange={(e) => updateGbpProfile(perfil.id, 'totalReviews', e.target.value === '' ? undefined : Number(e.target.value))}
+                            placeholder="Ex: 87"
+                          />
+                        </FormField>
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={addGbpProfile}
+                    className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                    style={{ color: 'var(--color-blue)', background: 'rgba(18,123,240,0.07)' }}
+                  >
+                    <Plus size={14} />
+                    Adicionar perfil
+                  </button>
                 </div>
               )}
             </div>

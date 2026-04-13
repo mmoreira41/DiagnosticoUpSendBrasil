@@ -1134,22 +1134,59 @@ function SecaoVisibilidade({ data }: { data: DiagnosticData }) {
         <FadeIn delay={400}>
           <div className="glass-panel p-6">
             <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-text-muted mb-4">Google Business Profile</h3>
-            <div className="flex items-center gap-6">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-text-primary">{data.gbpRating?.toFixed(1) ?? '—'}</div>
-                <div className="text-xs text-text-muted mt-1">{data.gbpTotalReviews} avaliações</div>
+            {(data.gbpProfiles ?? []).length > 0 ? (
+              <div className="space-y-4">
+                {(data.gbpProfiles ?? []).map((perfil, idx) => {
+                  const melhorConcAvaliacao = concMelhorAvaliado?.gbpRating ?? 0
+                  const perfilRating = perfil.rating ?? 0
+                  return (
+                    <div key={perfil.id} className="flex items-center gap-6">
+                      <div className="text-center min-w-[4rem]">
+                        <div className="text-4xl font-bold text-text-primary">
+                          {perfilRating > 0 ? perfilRating.toFixed(1) : '—'}
+                        </div>
+                        <div className="text-xs text-text-muted mt-1">
+                          {perfil.totalReviews ? `${perfil.totalReviews} aval.` : '—'}
+                        </div>
+                        {perfil.nome && (
+                          <div className="text-[10px] text-text-muted mt-0.5 font-medium">{perfil.nome}</div>
+                        )}
+                        {!perfil.nome && idx > 0 && (
+                          <div className="text-[10px] text-text-muted mt-0.5">Perfil {idx + 1}</div>
+                        )}
+                      </div>
+                      {concMelhorAvaliado?.gbpRating && melhorConcAvaliacao > perfilRating && (
+                        <div className="flex items-center gap-3 text-sm text-text-secondary">
+                          <span className="text-2xl text-red-400">→</span>
+                          <span>
+                            <strong>{concMelhorAvaliado.name}</strong> tem{' '}
+                            <strong style={{ color: '#dc2626' }}>{concMelhorAvaliado.gbpRating} ★</strong>{' '}
+                            ({concMelhorAvaliado.gbpReviews} avaliações)
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
-              {concMelhorAvaliado?.gbpRating && concMelhorAvaliado.gbpRating > (data.gbpRating ?? 0) && (
-                <div className="flex items-center gap-3 text-sm text-text-secondary">
-                  <span className="text-2xl text-red-400">→</span>
-                  <span>
-                    <strong>{concMelhorAvaliado.name}</strong> tem{' '}
-                    <strong style={{ color: '#dc2626' }}>{concMelhorAvaliado.gbpRating} ★</strong>{' '}
-                    ({concMelhorAvaliado.gbpReviews} avaliações)
-                  </span>
+            ) : (
+              <div className="flex items-center gap-6">
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-text-primary">{data.gbpRating?.toFixed(1) ?? '—'}</div>
+                  <div className="text-xs text-text-muted mt-1">{data.gbpTotalReviews} avaliações</div>
                 </div>
-              )}
-            </div>
+                {concMelhorAvaliado?.gbpRating && concMelhorAvaliado.gbpRating > (data.gbpRating ?? 0) && (
+                  <div className="flex items-center gap-3 text-sm text-text-secondary">
+                    <span className="text-2xl text-red-400">→</span>
+                    <span>
+                      <strong>{concMelhorAvaliado.name}</strong> tem{' '}
+                      <strong style={{ color: '#dc2626' }}>{concMelhorAvaliado.gbpRating} ★</strong>{' '}
+                      ({concMelhorAvaliado.gbpReviews} avaliações)
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </FadeIn>
       )}
